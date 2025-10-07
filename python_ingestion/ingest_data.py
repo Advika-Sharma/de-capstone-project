@@ -5,10 +5,8 @@ from dotenv import load_dotenv
 import os
 from time import sleep
 
-# Load environment variables
 load_dotenv()
 
-# --- Snowflake Connection Details ---
 SNOWFLAKE_USER = os.getenv('SNOWFLAKE_USER')
 SNOWFLAKE_PASSWORD = os.getenv('SNOWFLAKE_PASSWORD')
 SNOWFLAKE_ACCOUNT = os.getenv('SNOWFLAKE_ACCOUNT')
@@ -16,13 +14,10 @@ SNOWFLAKE_WAREHOUSE = os.getenv('SNOWFLAKE_WAREHOUSE')
 SNOWFLAKE_DATABASE = os.getenv('SNOWFLAKE_DATABASE')
 SNOWFLAKE_SCHEMA = os.getenv('SNOWFLAKE_SCHEMA')
 
-# --- Configuration ---
 POSTS_URL = "https://jsonplaceholder.typicode.com/posts"
 COMMENTS_URL = "https://jsonplaceholder.typicode.com/comments"
 POSTS_TABLE = "POSTS"
 COMMENTS_TABLE = "COMMENTS"
-
-# --- Utility Functions ---
 
 def fetch_data(url):
     """Fetches JSON data from a public API endpoint."""
@@ -76,21 +71,16 @@ def load_data_to_snowflake(data, table_name, conn):
     finally:
         cursor.close()
 
-# --- Main Execution ---
-
 def main():
     conn = connect_to_snowflake()
     if not conn:
         return
 
     try:
-        # 1. Fetch and load POSTS
         posts_data = fetch_data(POSTS_URL)
         load_data_to_snowflake(posts_data, POSTS_TABLE, conn)
 
-        sleep(2)  # avoid API overload
-
-        # 2. Fetch and load COMMENTS
+        sleep(2) 
         comments_data = fetch_data(COMMENTS_URL)
         load_data_to_snowflake(comments_data, COMMENTS_TABLE, conn)
 
