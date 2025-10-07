@@ -26,7 +26,7 @@ COMMENTS_TABLE = "COMMENTS"
 
 def fetch_data(url):
     """Fetches JSON data from a public API endpoint."""
-    print(f"\n📡 Fetching data from: {url}")
+    print(f"\n Fetching data from: {url}")
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -62,7 +62,7 @@ def load_data_to_snowflake(data, table_name, conn):
 
     cursor = conn.cursor()
     sql = f"INSERT INTO {table_name} (RAW_JSON) SELECT PARSE_JSON(%s)"
-    print(f"\n⬆ Loading {len(data)} records into {conn.database}.{conn.schema}.{table_name} ...")
+    print(f"\n Loading {len(data)} records into {conn.database}.{conn.schema}.{table_name} ...")
 
     try:
         cursor.execute(f"TRUNCATE TABLE {table_name}")
