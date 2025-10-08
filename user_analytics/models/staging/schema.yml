@@ -1,0 +1,81 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: USER_ACTIVITY_DB
+    schema: RAW_DATA
+    description: Raw data ingested directly from the JSONPlaceholder API.
+    tables:
+      - name: posts
+        description: Raw JSON data for user posts.
+      - name: comments
+        description: Raw JSON data for user comments on posts.
+
+models:
+  # --- STAGING MODELS (Clean Raw Data) ---
+  - name: stg_posts
+    description: Cleans and structures raw posts data, renaming keys and casting types.
+    columns:
+      - name: user_id
+        description: The ID of the user who created the post.
+      - name: post_id
+        description: The unique ID of the post (Primary Key).
+        tests:
+          - unique
+          - not_null
+      - name: title
+        description: The title of the post.
+      - name: body
+        description: The content/body of the post.
+
+  - name: stg_comments
+    description: Cleans and structures raw comments data.
+    columns:
+      - name: post_id
+        description: The ID of the post the comment belongs to (Foreign Key).
+        tests:
+          # Relationships test ensures every comment links back to an existing post
+          - relationships:
+              to: ref('stg_posts')
+              field: post_id
+      - name: comment_id
+        description: The unique ID of the comment (Primary Key).
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: Name provided by the commenter.
+      - name: email
+        description: Email address provided by the commenter.
+      - name: body
+        description: The content/body of the comment.
+
+  # --- DIMENSION MODEL (User List) ---
+  - name: dim_users
+    description: A dimension table listing all unique user IDs who have created posts.
+    columns:
+      - name: user_id
+        description: The unique ID of the user (Primary Key).
+        tests:
+          - unique
+          - not_null
+
+  # --- FACT MODEL (Final Analytics Mart) ---
+  - name: fct_posts
+    description: The final fact table containing post details and key metrics (number of comments).
+    columns:
+      - name: post_id
+        description: The unique ID of the post.
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: Foreign Key linking to dim_users.
+        tests:
+          - not_null
+      - name: title
+        description: The post title.
+      - name: number_of_comments
+        description: The total count of comments received on this post.
+
+
